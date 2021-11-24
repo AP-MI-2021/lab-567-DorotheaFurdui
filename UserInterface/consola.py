@@ -1,6 +1,7 @@
 from Domain.cheltuiala import to_str
 from Logic.crud import add_cheltuiala, edit_cheltuiala, delete_cheltuiala
-from Logic.operatiuni import stergere_toate_cheltuieli, add_valoare, cea_mai_mare_cheltuiala, ordonare_cheltuieli
+from Logic.operatiuni import stergere_toate_cheltuieli, add_valoare, cea_mai_mare_cheltuiala, ordonare_cheltuieli, \
+    cheltuieli_lunare, undo, redo
 
 
 def print_meniu():
@@ -8,7 +9,6 @@ def print_meniu():
         MENIU
         1. CRUD 
         2. Operatiuni
-        3. Undo/Redo
         x. Iesire
         ''')
 
@@ -19,7 +19,9 @@ def print_crud_meniu():
     2. Modificare
     3. Stergere
     4. Afisare toate cheltuielile
-    5. Inapoi
+    5. Undo
+    6. Redo
+    7. Inapoi
     ''')
 
 def print_operatiuni_meniu():
@@ -30,8 +32,36 @@ def print_operatiuni_meniu():
     3. Determinarea celei mai mari cheltuieli pentru fiecare tip de cheltuială.
     4. Ordonarea cheltuielilor descrescător după sumă.
     5. Afișarea sumelor lunare pentru fiecare apartament.
-    6. Inapoi
+    6. Afisare toate.
+    7. Undo.
+    8. Redo.
+    9. Inapoi
     ''')
+
+def handle_show_all(cheltuieli):
+    '''
+    Afiseaza lista de cheltuieli din memorie
+    :param cheltuieli: lista de cheltuieli
+    :return:
+    '''
+    for cheltuiala in cheltuieli:
+        print(to_str(cheltuiala))
+
+def handle_undo(cheltuieli):
+    try:
+        undo(cheltuieli)
+        print("undo done")
+        handle_show_all(cheltuieli)
+    except Exception  as ax:
+        print(ax)
+
+def handle_redo(cheltuieli):
+    try:
+        redo(cheltuieli)
+        print("redo done")
+        handle_show_all(cheltuieli)
+    except Exception  as ax:
+        print(ax)
 
 def run_crud_userinterface(cheltuieli):
     '''
@@ -40,14 +70,7 @@ def run_crud_userinterface(cheltuieli):
     :return:
     '''
 
-    def handle_show_all(cheltuieli):
-        '''
-        Afiseaza lista de cheltuieli din memorie
-        :param cheltuieli: lista de cheltuieli
-        :return:
-        '''
-        for cheltuiala in cheltuieli:
-            print(to_str(cheltuiala))
+
 
     def handle_edit_cheltuiala_userinterface(cheltuieli):
         '''
@@ -61,7 +84,7 @@ def run_crud_userinterface(cheltuieli):
         data = input('Dati data: ')
         tipul = input('Dati tipul: ')
         try:
-            cheltuieli = edit_cheltuiala(cheltuieli, id, numar_apartament, suma, data, tipul)
+            edit_cheltuiala(cheltuieli, id, numar_apartament, suma, data, tipul)
             print('Cheltuiala a fost modificata cu succes')
             return cheltuieli
         except ValueError as ve:
@@ -82,7 +105,7 @@ def run_crud_userinterface(cheltuieli):
         data = input('Dati data')
         tipul = input('Dati tipul')
         try:
-            cheltuieli = add_cheltuiala(cheltuieli, id, numar_apartament, suma, data, tipul)
+            add_cheltuiala(cheltuieli, id, numar_apartament, suma, data, tipul)
             print('Cheltuiala a fost adaugata cu succes')
             return cheltuieli
         except ValueError as ve:
@@ -101,9 +124,9 @@ def run_crud_userinterface(cheltuieli):
         :return:
         '''
         id_cheltuiala = input('Dati idul cheltuelii pe care vreti sa o stergeti')
-        cheltuieli_new = delete_cheltuiala(cheltuieli, id_cheltuiala)
+        delete_cheltuiala(cheltuieli, id_cheltuiala)
         print("Stergerea a avut loc cu succes!")
-        return cheltuieli_new
+
 
     while True:
         print_crud_meniu()
@@ -117,6 +140,10 @@ def run_crud_userinterface(cheltuieli):
         elif cmd == '4':
             handle_show_all(cheltuieli)
         elif cmd == '5':
+            handle_undo(cheltuieli)
+        elif cmd == '6':
+            handle_redo(cheltuieli)
+        elif cmd == '7':
             break
         else:
             print("Comanda invalida")
@@ -136,9 +163,8 @@ def run_operatiuni_userinterface(cheltuieli):
         :return:
         '''
         numar_apartament = int(input("Dati numarul apartamentului unde vreti sa stergeti toate cheltuielile: "))
-        cheltuieli_new = stergere_toate_cheltuieli(cheltuieli, numar_apartament)
+        stergere_toate_cheltuieli(cheltuieli, numar_apartament)
         print("Toate cheltuielile pentru apartamentul introdus au fost sterse cu succes!")
-        return cheltuieli_new
 
     def handle_add_valoare(cheltuieli):
         '''
@@ -148,9 +174,8 @@ def run_operatiuni_userinterface(cheltuieli):
         '''
         data = input("Introduceti data la care doriti sa adaugati o valoare: ")
         valoare = float(input("Introduceti valoarea pe care doriti sa o adaugati: "))
-        cheltuieli = add_valoare(cheltuieli, data, valoare)
+        add_valoare(cheltuieli, data, valoare)
         print("Valoarea a fost adaugata cu succes!")
-        return cheltuieli
 
     def handle_cea_mai_mare_cheltuiala(cheltuieli):
         '''
@@ -160,7 +185,7 @@ def run_operatiuni_userinterface(cheltuieli):
         '''
         result = cea_mai_mare_cheltuiala(cheltuieli)
         for tipul in result:
-            print("Tipul {} are cheltuiala(suma) maxima: {}".format(tipul, result[tipul]))
+            print(f"Tipul {tipul} are cheltuiala(suma) maxima: {result[tipul]}")
 
     def handle_ordonare_cheltuieli(cheltuieli):
         '''
@@ -168,33 +193,48 @@ def run_operatiuni_userinterface(cheltuieli):
         :param cheltuieli:
         :return:
         '''
-        cheltuieli = ordonare_cheltuieli(cheltuieli)
-        print('Ordonarea s-a facut cu succes!')
-        return cheltuieli
+        cheltuieli_ordonate = ordonare_cheltuieli(cheltuieli)
+        for cheltuiala in cheltuieli_ordonate:
+            print(to_str(cheltuiala))
+
+    def handle_cheltuieli_lunare(cheltuieli):
+        '''
+
+        :param cheltuieli:
+        :return:
+        '''
+        result = cheltuieli_lunare(cheltuieli)
+        for numar, date in result.items():
+            for an, luni in date.items():
+                for luna,  valoare in luni.items():
+                    print(f"numar: {numar} an: {an} luna: {luna} valoare: {valoare}")
 
 
     while True:
         print_operatiuni_meniu()
         cmd = input("Comanda: ")
         if cmd == '1':
-            cheltuieli = handle_stergere_toate_cheltuieli(cheltuieli)
+            handle_stergere_toate_cheltuieli(cheltuieli)
         elif cmd == '2':
-            cheltuieli = handle_add_valoare(cheltuieli)
-        if cmd == '3':
+            handle_add_valoare(cheltuieli)
+        elif cmd == '3':
             handle_cea_mai_mare_cheltuiala(cheltuieli)
         elif cmd == '4':
-            cheltuieli = handle_ordonare_cheltuieli(cheltuieli)
-        if cmd == '5':
-            pass
-           # cheltuieli = handle_show_sume_lunare(cheltuieli)
+            handle_ordonare_cheltuieli(cheltuieli)
+        elif cmd == '5':
+            handle_cheltuieli_lunare(cheltuieli)
+        elif cmd == '7':
+            handle_undo(cheltuieli)
+        elif cmd == '8':
+            handle_redo(cheltuieli)
+        elif cmd == '9':
+            break
         elif cmd == '6':
-            run_console(cheltuieli)
+            handle_show_all(cheltuieli)
         else:
             print("Comanda invalida")
 
 
-def run_undo_redo_userinterface(cheltuieli):
-    pass
 
 
 def run_console(cheltuieli):
@@ -210,8 +250,6 @@ def run_console(cheltuieli):
             run_crud_userinterface(cheltuieli)
         elif cmd == '2':
             run_operatiuni_userinterface(cheltuieli)
-        elif cmd == '3':
-            run_undo_redo_userinterface(cheltuieli)
         elif cmd == 'x':
             print("La revedere!")
             break

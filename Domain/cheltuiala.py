@@ -11,13 +11,14 @@ def create_cheltuiala(id, numar_apartament, suma, data, tipul):
 
     # return[id, numar_apartament, suma, data, tipul]
 
-    return{
+    return {
         "id": id,
         "numar_apartament": numar_apartament,
         "suma": suma,
         "data": data,
         "tipul": tipul
     }
+
 
 def get_id(cheltuiala):
     '''
@@ -28,6 +29,7 @@ def get_id(cheltuiala):
     # return cheltuiala[0]
     return cheltuiala['id']
 
+
 def set_id(cheltuiala, id):
     '''
     Setarea id la cheltuiala
@@ -36,6 +38,7 @@ def set_id(cheltuiala, id):
     :return:
     '''
     cheltuiala['id'] = id
+
 
 def get_numar_apartament(cheltuiala):
     '''
@@ -46,6 +49,7 @@ def get_numar_apartament(cheltuiala):
     # return cheltuiala[1]
     return cheltuiala['numar_apartament']
 
+
 def set_numar_apartament(cheltuiala, numar_apartament):
     '''
     Setarea numar_apartament la cheltuiala
@@ -54,6 +58,7 @@ def set_numar_apartament(cheltuiala, numar_apartament):
     :return:
     '''
     cheltuiala['numar_apartament'] = numar_apartament
+
 
 def get_suma(cheltuiala):
     '''
@@ -64,6 +69,7 @@ def get_suma(cheltuiala):
     # return cheltuiala[2]
     return cheltuiala['suma']
 
+
 def set_suma(cheltuiala, suma):
     '''
     Setarea suma la cheltuiala
@@ -72,6 +78,7 @@ def set_suma(cheltuiala, suma):
     :return:
     '''
     cheltuiala['suma'] = suma
+
 
 def get_data(cheltuiala):
     '''
@@ -82,6 +89,7 @@ def get_data(cheltuiala):
     # return cheltuiala[3]
     return cheltuiala['data']
 
+
 def set_data(cheltuiala, data):
     '''
     Setarea data la prajitura
@@ -90,6 +98,7 @@ def set_data(cheltuiala, data):
     :return:
     '''
     cheltuiala['data'] = data
+
 
 def get_tipul(cheltuiala):
     '''
@@ -100,6 +109,7 @@ def get_tipul(cheltuiala):
     # return cheltuiala[4]
     return cheltuiala['tipul']
 
+
 def set_tipul(cheltuiala, tipul):
     '''
     Setarea tipul la prajitura
@@ -109,7 +119,22 @@ def set_tipul(cheltuiala, tipul):
     '''
     cheltuiala['tipul'] = tipul
 
-def to_str(cheltuiala):
-    return f'id={get_id(cheltuiala)}, numar_apartament={get_numar_apartament(cheltuiala)}, suma={get_suma(cheltuiala)}'\
-            f'data={get_data(cheltuiala)}, tip={get_tipul(cheltuiala)}'
+def get_zi(cheltuiala):
+    data = get_data(cheltuiala)
+    data_list = data.split(".")
+    return data_list[0]
 
+def get_luna(cheltuiala):
+    data = get_data(cheltuiala)
+    data_list = data.split(".")
+    return data_list[1]
+
+def get_an(cheltuiala):
+    data = get_data(cheltuiala)
+    data_list = data.split(".")
+    return data_list[2]
+
+
+def to_str(cheltuiala):
+    return f'id={get_id(cheltuiala)}, numar_apartament={get_numar_apartament(cheltuiala)}, suma={get_suma(cheltuiala)}' \
+           f'data={get_data(cheltuiala)}, tip={get_tipul(cheltuiala)}'

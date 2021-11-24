@@ -1,9 +1,12 @@
+import copy
 from copy import deepcopy
 
 from Domain.cheltuiala import *
 from Domain.cheltuiala import create_cheltuiala, get_id, set_numar_apartament, set_suma, set_data, set_tipul
 from Logic.validator import validate_cheltuiala
 
+istoric = []
+istoric_redo=[]
 
 def find_cheltuiala(cheltuieli, id):
     '''
@@ -17,6 +20,7 @@ def find_cheltuiala(cheltuieli, id):
             return cheltuiala
     return None
 
+
 def edit_cheltuiala(cheltuieli, id, numar_apartament_new, suma_new, data_new, tipul_new):
     '''
     Editarea cheltuieli cu idul id si aruncarea unei erori ValueError in cazul in care fieldurile nu sunt
@@ -29,7 +33,10 @@ def edit_cheltuiala(cheltuieli, id, numar_apartament_new, suma_new, data_new, ti
     :param tipul_new: string
     :return:
     '''
-    id, nr_ap_new, suma_new, data_new, tipul_new = validate_cheltuiala(id, numar_apartament_new, suma_new, data_new, tipul_new)
+    add_istoric(cheltuieli)
+    istoric_redo.clear()
+    id, nr_ap_new, suma_new, data_new, tipul_new = validate_cheltuiala(id, numar_apartament_new, suma_new, data_new,
+                                                                       tipul_new)
     updated_list = deepcopy(cheltuieli)
     for cheltuiala in updated_list:
         if get_id(cheltuiala) == id:
@@ -37,8 +44,7 @@ def edit_cheltuiala(cheltuieli, id, numar_apartament_new, suma_new, data_new, ti
             set_suma(cheltuiala, suma_new)
             set_data(cheltuiala, data_new)
             set_tipul(cheltuiala, tipul_new)
-    return updated_list
-
+    cheltuieli[:] = updated_list
 
 
 def add_cheltuiala(cheltuieli, id, numar_apartament, suma, data, tipul):
@@ -52,10 +58,12 @@ def add_cheltuiala(cheltuieli, id, numar_apartament, suma, data, tipul):
     :param tipul: string
     :return:
     '''
+    add_istoric(cheltuieli)
+    istoric_redo.clear()
     id, numar_apartament, suma, data, tipul = validate_cheltuiala(id, numar_apartament, suma, data, tipul)
     cheltuiala = create_cheltuiala(id, numar_apartament, suma, data, tipul)
     cheltuieli.append(cheltuiala)
-    return cheltuieli
+
 
 def delete_cheltuiala(cheltuieli, id):
     '''
@@ -64,5 +72,10 @@ def delete_cheltuiala(cheltuieli, id):
     :param id:
     :return:
     '''
+    add_istoric(cheltuieli)
+    istoric_redo.clear()
     result_list = [cheltuiala for cheltuiala in cheltuieli if get_id(cheltuiala) != id]
-    return result_list
+    cheltuieli[:] = result_list
+
+def add_istoric(cheltuieli):
+    istoric.append(copy.deepcopy(cheltuieli))
